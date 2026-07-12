@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - StegaCrypt</title>
+    <meta name="description" content="Login to StegaCrypt to conceal secret messages inside images and PDF files." />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <link rel="icon" href="encryption.png" type="image/png" />
+    <link rel="stylesheet" href="splash.css" />
+    <style>
+        .login-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .auth-header {
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.5);
+            font-family: var(--sans);
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-auth {
+            width: 100%;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .auth-switch {
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .auth-switch a {
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .auth-switch a:hover {
+            color: var(--accent-purple);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .success-msg {
+            color: var(--accent-emerald);
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── Cybersecurity Particle Network Background ── -->
+    <canvas id="cyberCanvas" aria-hidden="true"></canvas>
+
+    <!-- ── Animated Background Orbs ── -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+        <div class="orb orb-5"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="auth-box glass">
+            <div class="auth-header">
+                <h2>Welcome to <span class="nav-name"><span class="brand-stega">Stega</span><span
+                            class="brand-crypt">Crypt</span></span></h2>
+                <p id="auth-subtitle">Sign in to access the steganography tool.</p>
+            </div>
+
+            <div id="error-message" class="error-msg">Invalid credentials.</div>
+            <div id="success-message" class="success-msg">Registration successful! You can now log in.</div>
+
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter Email (Name@example.com)"
+                        required />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter Password" required />
+                </div>
+                <button type="submit" class="btn-primary btn-auth" id="auth-btn">Sign In</button>
+            </form>
+
+            <div class="auth-switch">
+                <span id="switch-text">Don't have an account?</span>
+                <a id="switch-link">Register here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Particle Network Background Script ── -->
+    <script>
+        (() => {
+            const canvas = document.getElementById('cyberCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height, particles = [];
+
+            const CONFIG = {
+                particleCount: 160,
+                particleSize: 4,
+                particleColor: { r: 212, g: 225, b: 255 },
+                particleOpacity: 0.5,
+                linkDistance: 200,
+                linkColor: { r: 212, g: 225, b: 255 },
+                linkOpacity: 0.6,
+                linkWidth: 2,
+                moveSpeed: 3,
+                mouseRepulseDistance: 100,
+                mouseRepulseDuration: 0.4,
+                densityArea: 300
+            };
+
+            const mouse = { x: -9999, y: -9999 };
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                adjustParticleCount();
+            }
+
+            function adjustParticleCount() {
+                const area = width * height;
+                const targetCount = Math.floor((area / (CONFIG.densityArea * CONFIG.densityArea)) * CONFIG.particleCount);
+                const count = Math.min(Math.max(targetCount, 40), 300);
+
+                while (particles.length < count) {
+                    particles.push(createParticle());
+                }
+                while (particles.length > count) {
+                    particles.pop();
+                }
+            }
+
+            function createParticle(x, y) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = CONFIG.moveSpeed * (0.5 + Math.random() * 0.5);
+                return {
+                    x: x !== undefined ? x : Math.random() * width,
+                    y: y !== undefined ? y : Math.random() * height,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: CONFIG.particleSize,
+                    opacity: CONFIG.particleOpacity
+                };
+            }
+
+            function updateParticles() {
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+
+                    if (mouse.x !== -9999) {
+                        const dx = p.x - mouse.x;
+                        const dy = p.y - mouse.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < CONFIG.mouseRepulseDistance) {
+                            const force = (CONFIG.mouseRepulseDistance - dist) / CONFIG.mouseRepulseDistance;
+                            const angle = Math.atan2(dy, dx);
+                            const repulseForce = force * 6;
+                            p.vx += Math.cos(angle) * repulseForce;
+                            p.vy += Math.sin(angle) * repulseForce;
+                        }
+                    }
+
+                    const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                    const maxSpeed = CONFIG.moveSpeed * 3;
+                    if (currentSpeed > maxSpeed) {
+                        p.vx = (p.vx / currentSpeed) * maxSpeed;
+                        p.vy = (p.vy / currentSpeed) * maxSpeed;
+                    }
+
+                    if (currentSpeed > CONFIG.moveSpeed) {
+                        const decay = 1 - CONFIG.mouseRepulseDuration * 0.02;
+                        p.vx *= decay;
+                        p.vy *= decay;
+
+                        const newSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                        if (newSpeed < CONFIG.moveSpeed * 0.5) {
+                            const angle = Math.atan2(p.vy, p.vx);
+                            p.vx = Math.cos(angle) * CONFIG.moveSpeed * 0.5;
+                            p.vy = Math.sin(angle) * CONFIG.moveSpeed * 0.5;
+                        }
+                    }
+
+                    p.x += p.vx * 0.15;
+                    p.y += p.vy * 0.15;
+
+                    if (p.x < 0) {
+                        p.x = 0;
+                        p.vx = Math.abs(p.vx);
+                    } else if (p.x > width) {
+                        p.x = width;
+                        p.vx = -Math.abs(p.vx);
+                    }
+
+                    if (p.y < 0) {
+                        p.y = 0;
+                        p.vy = Math.abs(p.vy);
+                    } else if (p.y > height) {
+                        p.y = height;
+                        p.vy = -Math.abs(p.vy);
+                    }
+                }
+            }
+
+            function drawParticles() {
+                const { r, g, b } = CONFIG.particleColor;
+                const lr = CONFIG.linkColor.r;
+                const lg = CONFIG.linkColor.g;
+                const lb = CONFIG.linkColor.b;
+
+                ctx.lineWidth = CONFIG.linkWidth;
+
+                for (let i = 0; i < particles.length; i++) {
+                    const a = particles[i];
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const bP = particles[j];
+                        const dx = a.x - bP.x;
+                        const dy = a.y - bP.y;
+
+                        if (Math.abs(dx) > CONFIG.linkDistance || Math.abs(dy) > CONFIG.linkDistance) continue;
+
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < CONFIG.linkDistance) {
+                            const opacity = (1 - dist / CONFIG.linkDistance) * CONFIG.linkOpacity;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(bP.x, bP.y);
+                            ctx.strokeStyle = `rgba(${lr}, ${lg}, ${lb}, ${opacity})`;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.opacity})`;
+                    ctx.fill();
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                updateParticles();
+                drawParticles();
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('mousemove', e => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
+
+            window.addEventListener('mouseleave', () => {
+                mouse.x = -9999;
+                mouse.y = -9999;
+            });
+
+            window.addEventListener('resize', resize);
+
+            resize();
+            animate();
+        })();
+    </script>
+
+    <!-- ── Authentication Logic ── -->
+    <script>
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const authBtn = document.getElementById('auth-btn');
+        const switchText = document.getElementById('switch-text');
+        const switchLink = document.getElementById('switch-link');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const errorMsg = document.getElementById('error-message');
+        const successMsg = document.getElementById('success-message');
+
+        let isLoginMode = true;
+
+        switchLink.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            if (isLoginMode) {
+                authSubtitle.textContent = 'Sign in to access the steganography tool.';
+                authBtn.textContent = 'Sign In';
+                switchText.textContent = "Don't have an account?";
+                switchLink.textContent = 'Register here';
+            } else {
+                authSubtitle.textContent = 'Create an account to get started.';
+                authBtn.textContent = 'Register';
+                switchText.textContent = 'Already have an account?';
+                switchLink.textContent = 'Sign in';
+            }
+        });
+
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            if (isLoginMode) {
+                // Login
+                const users = JSON.parse(localStorage.getItem('stegacrypt_users')) || {};
+                if (users[email] && users[email] === password) {
+                    // Success
+                    localStorage.setItem('stegacrypt_logged_in', 'true');
+                    window.location.href = 'splash.html';
+                } else {
+                    errorMsg.textContent = 'Invalid email or password.';
+                    errorMsg.style.display = 'block';
+                }
+            } else {
+                // Register
+                const users = JSON.parse(localStorage.getItem('stegacrypt_users')) || {};
+                if (users[email]) {
+                    errorMsg.textContent = 'An account with this email already exists.';
+                    errorMsg.style.display = 'block';
+                } else {
+                    users[email] = password;
+                    localStorage.setItem('stegacrypt_users', JSON.stringify(users));
+                    successMsg.style.display = 'block';
+
+                    // Switch back to login mode
+                    setTimeout(() => {
+                        switchLink.click();
+                        emailInput.value = email; // pre-fill email
+                    }, 1500);
+                }
+            }
+        });
+
+        // Check if already logged in
+        if (localStorage.getItem('stegacrypt_logged_in') === 'true') {
+            window.location.href = 'splash.html';
+        }
+    </script>
+</body>
+
+</html>
