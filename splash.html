@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StegaCrypt — Hide Messages in Plain Sight</title>
+    <title>Steganography Tool — Image & PDF</title>
     <meta name="description"
-        content="A powerful client-side steganography tool to conceal secret messages inside images and PDF files. Secure, private, and runs entirely in your browser." />
+        content="Hide secret messages inside images or PDF files using steganography — fully client-side, no data leaves your browser." />
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
         rel="stylesheet" />
     <link rel="icon" href="encryption.png" type="image/png" />
-    <link rel="stylesheet" href="splash.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -30,195 +30,256 @@
 
     <!-- ── Navigation ── -->
     <nav class="navbar" id="navbar">
-        <a href="splash.html" class="nav-brand">
+        <a href="index.html" class="nav-brand">
             <span class="nav-name"><span class="brand-stega">Stega</span><span class="brand-crypt">Crypt</span></span>
         </a>
         <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How It Works</a>
-            <a href="#security">Security</a>
-            <a href="index.html">Launch Tool →</a>
-            <a href="#" id="logoutBtn"
-                style="color: #ef4444; font-weight: 600; margin-left: 10px; text-decoration: none; cursor: pointer;">Logout</a>
+            <a href="index.html#features">Features</a>
+            <a href="index.html#how-it-works">How It Works</a>
+            <a href="index.html#security">Security</a>
+            <a href="#" id="logoutBtn" style="color: #ef4444; font-weight: 600; margin-left: 10px; text-decoration: none; cursor: pointer;">Logout</a>
         </div>
     </nav>
 
-    <!-- ══════════════ HERO SECTION ══════════════ -->
-    <section class="hero" id="hero">
-        <div class="hero-badge animate-in">
-            <span class="badge-dot"></span>
-            Client-Side · No Data Leaves Your Device
-        </div>
-
-        <h1 class="hero-title animate-in delay-1">
-            Hide Messages<br />
-            <span class="gradient-text">In Plain Sight</span>
-        </h1>
-
-        <p class="hero-subtitle animate-in delay-2">
-            Conceal secret messages inside ordinary images and PDF files using
-            advanced steganography — with auto-generated encryption keys and
-            one-click sharing.
+    <header class="tool-header">
+        <div class="logo-badge animate-in"><span class="dot"></span> Client-Side</div>
+        <h1 class="animate-in delay-1">Steganography Tool</h1>
+        <p class="tagline animate-in delay-2">Conceal secret messages inside ordinary images <em>or PDF files</em> using secure encoding
         </p>
+    </header>
 
-        <div class="hero-actions animate-in delay-3">
-            <a href="index.html" class="btn-primary">
-                Launch Tool
-            </a>
-            <a href="#how-it-works" class="btn-secondary">
-                Learn More
-            </a>
+    <div class="card animate-in delay-3">
+
+        <!-- ── Mode Switcher (Image / PDF) ───────────────────────────────── -->
+        <div class="mode-switcher">
+            <button class="mode-btn active" id="modeImage" onclick="switchMode('image')">
+                <span>🖼️</span> Image Mode
+            </button>
+            <button class="mode-btn" id="modePDF" onclick="switchMode('pdf')">
+                <span>📄</span> PDF Mode
+            </button>
         </div>
 
-        <div class="hero-stats animate-in delay-4">
-            <div class="stat">
-                <div class="stat-value">2</div>
-                <div class="stat-label">File Modes</div>
+        <!-- ── Encode / Decode Tabs ──────────────────────────────────────── -->
+        <div class="tabs">
+            <div class="tab active" id="tab-encode" onclick="switchTab('encode')">
+                <span class="tab-icon">🔒</span>Encode
             </div>
-            <div class="stat-divider"></div>
-            <div class="stat">
-                <div class="stat-value">0</div>
-                <div class="stat-label">Data Uploaded</div>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat">
-                <div class="stat-value">AES</div>
-                <div class="stat-label">Key Protection</div>
+            <div class="tab" id="tab-decode" onclick="switchTab('decode')">
+                <span class="tab-icon">🔓</span>Decode
             </div>
         </div>
-    </section>
 
-    <!-- ══════════════ FEATURES ══════════════ -->
-    <section class="features" id="features">
-        <div class="section-header">
-            <span class="section-badge">Features</span>
-            <h2>Everything You Need</h2>
-            <p>Powerful steganography tools built for simplicity and security</p>
-        </div>
+        <!-- ══════════════ IMAGE MODE AREA ══════════════════════════════════ -->
+        <div id="imageModeArea">
 
-        <div class="feature-grid">
-            <div class="feature-card glass">
-                <div class="feature-icon">🖼️</div>
-                <h3>Image Steganography</h3>
-                <p>Hide secret messages within PNG and JPEG images using LSB (Least Significant Bit) encoding. The image
-                    looks identical to the naked eye.</p>
-            </div>
+            <!-- IMAGE ENCODE -->
+            <div id="img-encodeSection" class="section active">
+                <div class="field">
+                    <label>Cover Image (PNG / JPG)</label>
+                    <div class="file-drop" id="encodeDropZone">
+                        <input type="file" id="encodeImage" accept="image/png,image/jpeg"
+                            onchange="onEncodeImageChange()" />
+                        <div class="file-drop-icon">🖼️</div>
+                        <div class="file-drop-text">Drop image here or <span>browse</span></div>
+                        <div class="file-name" id="encodeFileName"></div>
+                    </div>
+                    <div class="preview-wrap" id="encodePreviewWrap">
+                        <img id="encodePreview" alt="Cover image preview" />
+                    </div>
+                    <div class="capacity-wrap" id="capacityWrap">
+                        <div class="capacity-label">
+                            <span>Message capacity used</span>
+                            <span id="capacityPct">0%</span>
+                        </div>
+                        <div class="capacity-bar-bg">
+                            <div class="capacity-bar" id="capacityBar"></div>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="feature-card glass">
-                <div class="feature-icon">📄</div>
-                <h3>PDF Steganography</h3>
-                <p>Embed hidden messages inside PDF files. The document remains fully readable and functional — your
-                    secret data rides along invisibly.</p>
-            </div>
+                <div class="field">
+                    <label>Secret Message</label>
+                    <textarea id="encodeText" placeholder="Type your secret message here…"
+                        oninput="updateCapacity()"></textarea>
+                    <div class="char-info">
+                        <span class="char-count" id="charCount">0 chars</span>
+                    </div>
+                </div>
 
-            <div class="feature-card glass">
-                <div class="feature-icon">🔑</div>
-                <h3>Auto-Generated Keys</h3>
-                <p>Unique encryption keys are auto-generated for every encoding session. No weak passwords — just
-                    strong, random 16-character keys.</p>
-            </div>
+                <button class="btn" onclick="encode()" id="encodeBtn">🔒 &nbsp;Encode Message</button>
 
-            <div class="feature-card glass">
-                <div class="feature-icon">📧</div>
-                <h3>Gmail Integration</h3>
-                <p>Share your secret key via Gmail with one click. The compose window opens with the key and decoding
-                    instructions pre-filled.</p>
-            </div>
+                <!-- Post-Encode Result Panel -->
+                <div class="encode-result" id="imgEncodeResult">
+                    <div class="result-title">Encoded Successfully</div>
 
-            <div class="feature-card glass">
-                <div class="feature-icon">🌐</div>
-                <h3>Fully Offline</h3>
-                <p>Runs 100% in your browser. No server, no uploads, no tracking. Your files and messages never leave
-                    your device.</p>
-            </div>
+                    <div class="key-display">
+                        <div class="key-display-label">🔑 Your Secret Key</div>
+                        <div class="key-display-box">
+                            <span class="key-display-value" id="imgGeneratedKey"></span>
+                            <button class="key-copy-btn" onclick="copyKey('imgGeneratedKey', this)">📋 Copy</button>
+                        </div>
+                        <div class="key-save-hint">⚠️ Save this key — the receiver needs it to decode. This is your only
+                            copy.</div>
+                    </div>
 
-            <div class="feature-card glass">
-                <div class="feature-icon">⚡</div>
-                <h3>Instant Processing</h3>
-                <p>Encode and decode in milliseconds. No waiting for server responses — everything happens locally at
-                    native speed.</p>
-            </div>
-        </div>
-    </section>
+                    <div class="action-group">
+                        <button class="btn-action btn-download" onclick="downloadEncodedImage()">📥 Download
+                            Image</button>
+                    </div>
 
-    <!-- ══════════════ HOW IT WORKS ══════════════ -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="section-header">
-            <span class="section-badge">Process</span>
-            <h2>How It Works</h2>
-            <p>Three simple steps to hide and reveal secret messages</p>
-        </div>
-
-        <div class="steps">
-            <div class="step">
-                <div class="step-number">01</div>
-                <div class="step-content">
-                    <h3>Upload & Write</h3>
-                    <p>Choose a cover image or PDF, then type your secret message. The tool calculates how much data
-                        your file can hold.</p>
+                    <div class="email-section">
+                        <div class="email-section-label">📧 Share Key via Gmail</div>
+                        <div class="email-input-row">
+                            <input type="email" id="imgReceiverEmail" placeholder="Receiver's email address…" />
+                            <button class="email-send-btn" onclick="sendImageViaGmail()">Open Gmail ✉️</button>
+                        </div>
+                        <div class="email-note">Opens Gmail with the key pre-filled. You'll need to attach the
+                            downloaded encoded image before sending.</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="step-connector"></div>
+            <!-- IMAGE DECODE -->
+            <div id="img-decodeSection" class="section">
+                <div class="field">
+                    <label>Encoded Image (PNG only)</label>
+                    <div class="file-drop" id="decodeDropZone">
+                        <input type="file" id="decodeImage" accept="image/png" onchange="onDecodeImageChange()" />
+                        <div class="file-drop-icon">🔍</div>
+                        <div class="file-drop-text">Drop encoded PNG here or <span>browse</span></div>
+                        <div class="file-name" id="decodeFileName"></div>
+                    </div>
+                    <div class="preview-wrap" id="decodePreviewWrap">
+                        <img id="decodePreview" alt="Encoded image preview" />
+                    </div>
+                </div>
 
-            <div class="step">
-                <div class="step-number">02</div>
-                <div class="step-content">
-                    <h3>Encode & Download</h3>
-                    <p>Click Encode — a unique key is auto-generated and your message is hidden inside the file.
-                        Download the encoded file instantly.</p>
+                <div class="field key-field">
+                    <label>🔑 Secret Key <span class="key-hint">(must match the key used during encoding)</span></label>
+                    <div class="key-input-wrap">
+                        <input type="password" id="decodeKey" placeholder="Enter the secret key…" autocomplete="off" />
+                        <button type="button" class="key-toggle" onclick="toggleKeyVisibility('decodeKey', this)"
+                            title="Show/Hide key">👁️</button>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Revealed Message</label>
+                    <textarea id="decodeText" readonly placeholder="Decoded message will appear here…"></textarea>
+                </div>
+
+                <button class="btn btn-decode" onclick="decode()" id="decodeBtn">🔓 &nbsp;Decode Image</button>
+            </div>
+
+        </div><!-- end #imageModeArea -->
+
+        <!-- ══════════════ PDF MODE AREA ═════════════════════════════════════ -->
+        <div id="pdfModeArea" style="display:none;">
+
+            <!-- PDF ENCODE -->
+            <div id="pdf-encodeSection" class="section active">
+                <div class="field">
+                    <label>Cover PDF File</label>
+                    <div class="file-drop" id="pdfEncodeDropZone">
+                        <input type="file" id="encodePDF" accept="application/pdf" onchange="onEncodePDFChange()" />
+                        <div class="file-drop-icon">📄</div>
+                        <div class="file-drop-text">Drop PDF here or <span>browse</span></div>
+                        <div class="file-name" id="pdfEncodeFileName"></div>
+                    </div>
+                    <div class="capacity-note" id="pdfCapacityNote" style="display:none;"></div>
+                </div>
+
+                <div class="field">
+                    <label>Secret Message</label>
+                    <textarea id="pdfEncodeMsg" placeholder="Type your secret message here…"
+                        oninput="updatePDFCapacity()"></textarea>
+                    <div class="char-info">
+                        <span class="char-count" id="pdfCharCount">0 chars</span>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="encodePDF()" id="pdfEncodeBtn">📄 &nbsp;Encode Message</button>
+
+                <!-- Post-Encode Result Panel -->
+                <div class="encode-result" id="pdfEncodeResult">
+                    <div class="result-title">Encoded Successfully</div>
+
+                    <div class="key-display">
+                        <div class="key-display-label">🔑 Your Secret Key</div>
+                        <div class="key-display-box">
+                            <span class="key-display-value" id="pdfGeneratedKey"></span>
+                            <button class="key-copy-btn" onclick="copyKey('pdfGeneratedKey', this)">📋 Copy</button>
+                        </div>
+                        <div class="key-save-hint">⚠️ Save this key — the receiver needs it to decode. This is your only
+                            copy.</div>
+                    </div>
+
+                    <div class="action-group">
+                        <button class="btn-action btn-download" onclick="downloadEncodedPDF()">📥 Download PDF</button>
+                    </div>
+
+                    <div class="email-section">
+                        <div class="email-section-label">📧 Share Key via Gmail</div>
+                        <div class="email-input-row">
+                            <input type="email" id="pdfReceiverEmail" placeholder="Receiver's email address…" />
+                            <button class="email-send-btn" onclick="sendPDFViaGmail()">Open Gmail ✉️</button>
+                        </div>
+                        <div class="email-note">Opens Gmail with the key pre-filled. You'll need to attach the
+                            downloaded encoded PDF before sending.</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="step-connector"></div>
-
-            <div class="step">
-                <div class="step-number">03</div>
-                <div class="step-content">
-                    <h3>Share & Decode</h3>
-                    <p>Send the encoded file and key to your recipient. They upload the file, enter the key, and the
-                        hidden message is revealed.</p>
+            <!-- PDF DECODE -->
+            <div id="pdf-decodeSection" class="section">
+                <div class="field">
+                    <label>Encoded PDF File</label>
+                    <div class="file-drop" id="pdfDecodeDropZone">
+                        <input type="file" id="decodePDF" accept="application/pdf" onchange="onDecodePDFChange()" />
+                        <div class="file-drop-icon">🔍</div>
+                        <div class="file-drop-text">Drop encoded PDF here or <span>browse</span></div>
+                        <div class="file-name" id="pdfDecodeFileName"></div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- ══════════════ SECURITY SECTION ══════════════ -->
-    <section class="security" id="security">
-        <div class="security-inner glass">
-            <div class="security-text">
-                <span class="section-badge">Privacy First</span>
-                <h2>Your Data Never Leaves Your Browser</h2>
-                <p>Unlike other tools, StegaCrypt processes everything client-side. There's no server, no database, and
-                    no analytics. Your files and messages are never transmitted over the internet.</p>
-                <ul class="security-list">
-                    <li><span class="check">✓</span> No file uploads to any server</li>
-                    <li><span class="check">✓</span> No message content is stored</li>
-                    <li><span class="check">✓</span> No cookies or tracking</li>
-                    <li><span class="check">✓</span> Works fully offline after first load</li>
-                    <li><span class="check">✓</span> Open source and auditable</li>
-                </ul>
-            </div>
-            <div class="security-visual">
-                <div class="shield">
-                    <div class="shield-icon">🛡️</div>
-                    <div class="shield-ring"></div>
-                    <div class="shield-ring ring-2"></div>
+                <div class="field key-field">
+                    <label>🔑 Secret Key <span class="key-hint">(must match the key used during encoding)</span></label>
+                    <div class="key-input-wrap">
+                        <input type="password" id="pdfDecodeKey" placeholder="Enter the secret key…"
+                            autocomplete="off" />
+                        <button type="button" class="key-toggle" onclick="toggleKeyVisibility('pdfDecodeKey', this)"
+                            title="Show/Hide key">👁️</button>
+                    </div>
                 </div>
+
+                <div class="field">
+                    <label>Revealed Message</label>
+                    <textarea id="pdfDecodeText" readonly placeholder="Decoded message will appear here…"></textarea>
+                </div>
+
+                <button class="btn btn-decode" onclick="decodePDF()" id="pdfDecodeBtn">🔓 &nbsp;Decode PDF</button>
+            </div>
+
+        </div><!-- end #pdfModeArea -->
+
+        <div id="status"></div>
+
+        <div class="info-row">
+            <div class="info-pill">
+                <div class="pill-icon">🔐</div>
+                <p>Steganography — hides data within image pixels <em>or</em> PDF binary bytes</p>
+            </div>
+            <div class="info-pill">
+                <div class="pill-icon">🌐</div>
+                <p>100% in-browser — your files never leave your device</p>
+            </div>
+            <div class="info-pill">
+                <div class="pill-icon">📄</div>
+                <p>Always use the encoded file for decoding; re-compression breaks the hidden data</p>
             </div>
         </div>
-    </section>
-
-    <!-- ══════════════ CTA SECTION ══════════════ -->
-    <section class="cta-section">
-        <div class="cta-inner">
-            <h2>Ready to Hide Your First Message?</h2>
-            <p>No installation. Just open the tool and start encoding.</p>
-            <a href="index.html" class="btn-primary btn-lg">
-                Open Steganography Tool
-            </a>
-        </div>
-    </section>
+    </div>
 
     <!-- ══════════════ FOOTER ══════════════ -->
     <footer>
@@ -230,37 +291,7 @@
         </div>
     </footer>
 
-    <!-- ── Scroll Reveal Script ── -->
-    <script>
-        // Navbar background on scroll
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            navbar.classList.toggle('scrolled', window.scrollY > 50);
-        });
-
-        // Intersection Observer for scroll animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
-
-        document.querySelectorAll('.feature-card, .step, .security-inner, .cta-inner').forEach(el => {
-            el.classList.add('scroll-reveal');
-            observer.observe(el);
-        });
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(link => {
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const target = document.querySelector(link.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-        });
-    </script>
+    <canvas id="canvas"></canvas>
 
     <!-- ── Authentication Logic ── -->
     <script>
@@ -280,7 +311,16 @@
         }
     </script>
 
-    <!-- ── Particle Network Background ── -->
+    <script src="script.js"></script>
+
+    <!-- ── Visual Scripts (Scroll & Particles) ── -->
+    <script>
+        // Navbar background on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+    </script>
     <script>
         (() => {
             const canvas = document.getElementById('cyberCanvas');
@@ -300,161 +340,112 @@
                 moveSpeed: 3,
                 mouseRepulseDistance: 100,
                 mouseRepulseDuration: 0.4,
-                densityArea: 300
             };
 
-            const mouse = { x: -9999, y: -9999 };
+            let mouse = { x: -9999, y: -9999 };
 
             function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-                adjustParticleCount();
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                initParticles();
             }
 
-            function adjustParticleCount() {
-                // Density-based count like tsParticles
-                const area = width * height;
-                const targetCount = Math.floor((area / (CONFIG.densityArea * CONFIG.densityArea)) * CONFIG.particleCount);
-                const count = Math.min(Math.max(targetCount, 40), 300);
-
-                while (particles.length < count) {
-                    particles.push(createParticle());
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    const angle = Math.random() * Math.PI * 2;
+                    this.vx = Math.cos(angle) * (Math.random() * 0.5 + 0.1) * CONFIG.moveSpeed;
+                    this.vy = Math.sin(angle) * (Math.random() * 0.5 + 0.1) * CONFIG.moveSpeed;
+                    
+                    this.baseVx = this.vx;
+                    this.baseVy = this.vy;
                 }
-                while (particles.length > count) {
-                    particles.pop();
-                }
-            }
 
-            function createParticle(x, y) {
-                // Random direction
-                const angle = Math.random() * Math.PI * 2;
-                const speed = CONFIG.moveSpeed * (0.5 + Math.random() * 0.5);
-                return {
-                    x: x !== undefined ? x : Math.random() * width,
-                    y: y !== undefined ? y : Math.random() * height,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    size: CONFIG.particleSize,
-                    opacity: CONFIG.particleOpacity
-                };
-            }
+                update() {
+                    // Mouse repulse logic
+                    const dx = this.x - mouse.x;
+                    const dy = this.y - mouse.y;
+                    const distSq = dx * dx + dy * dy;
+                    const repulseRadiusSq = CONFIG.mouseRepulseDistance * CONFIG.mouseRepulseDistance;
 
-            function updateParticles() {
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-
-                    // Mouse repulse
-                    if (mouse.x !== -9999) {
-                        const dx = p.x - mouse.x;
-                        const dy = p.y - mouse.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-
-                        if (dist < CONFIG.mouseRepulseDistance) {
-                            const force = (CONFIG.mouseRepulseDistance - dist) / CONFIG.mouseRepulseDistance;
-                            const angle = Math.atan2(dy, dx);
-                            const repulseForce = force * 6;
-                            p.vx += Math.cos(angle) * repulseForce;
-                            p.vy += Math.sin(angle) * repulseForce;
-                        }
+                    if (distSq < repulseRadiusSq && distSq > 0) {
+                        const dist = Math.sqrt(distSq);
+                        const force = (CONFIG.mouseRepulseDistance - dist) / CONFIG.mouseRepulseDistance;
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+                        
+                        this.vx += nx * force * 5;
+                        this.vy += ny * force * 5;
+                    } else {
+                        // Gradual return to base velocity
+                        this.vx += (this.baseVx - this.vx) * 0.05;
+                        this.vy += (this.baseVy - this.vy) * 0.05;
                     }
 
-                    // Clamp max velocity
-                    const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-                    const maxSpeed = CONFIG.moveSpeed * 3;
-                    if (currentSpeed > maxSpeed) {
-                        p.vx = (p.vx / currentSpeed) * maxSpeed;
-                        p.vy = (p.vy / currentSpeed) * maxSpeed;
-                    }
-
-                    // Gradually return to normal speed
-                    if (currentSpeed > CONFIG.moveSpeed) {
-                        const decay = 1 - CONFIG.mouseRepulseDuration * 0.02;
-                        p.vx *= decay;
-                        p.vy *= decay;
-
-                        // Don't let it slow below base speed
-                        const newSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-                        if (newSpeed < CONFIG.moveSpeed * 0.5) {
-                            const angle = Math.atan2(p.vy, p.vx);
-                            p.vx = Math.cos(angle) * CONFIG.moveSpeed * 0.5;
-                            p.vy = Math.sin(angle) * CONFIG.moveSpeed * 0.5;
-                        }
-                    }
-
-                    // Move
-                    p.x += p.vx * 0.15;
-                    p.y += p.vy * 0.15;
+                    this.x += this.vx;
+                    this.y += this.vy;
 
                     // Bounce off edges
-                    if (p.x < 0) {
-                        p.x = 0;
-                        p.vx = Math.abs(p.vx);
-                    } else if (p.x > width) {
-                        p.x = width;
-                        p.vx = -Math.abs(p.vx);
-                    }
+                    if (this.x < 0) { this.x = 0; this.vx *= -1; this.baseVx *= -1; }
+                    if (this.x > width) { this.x = width; this.vx *= -1; this.baseVx *= -1; }
+                    if (this.y < 0) { this.y = 0; this.vy *= -1; this.baseVy *= -1; }
+                    if (this.y > height) { this.y = height; this.vy *= -1; this.baseVy *= -1; }
+                }
 
-                    if (p.y < 0) {
-                        p.y = 0;
-                        p.vy = Math.abs(p.vy);
-                    } else if (p.y > height) {
-                        p.y = height;
-                        p.vy = -Math.abs(p.vy);
-                    }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, CONFIG.particleSize, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${CONFIG.particleColor.r}, ${CONFIG.particleColor.g}, ${CONFIG.particleColor.b}, ${CONFIG.particleOpacity})`;
+                    ctx.fill();
                 }
             }
 
-            function drawParticles() {
-                const { r, g, b } = CONFIG.particleColor;
-                const lr = CONFIG.linkColor.r;
-                const lg = CONFIG.linkColor.g;
-                const lb = CONFIG.linkColor.b;
+            function initParticles() {
+                particles = [];
+                // Scale count based on screen area to maintain density
+                const area = width * height;
+                const baseArea = 1920 * 1080;
+                const scaledCount = Math.max(50, Math.floor(CONFIG.particleCount * (area / baseArea)));
+                
+                for (let i = 0; i < scaledCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
 
-                // Draw links first (behind particles)
-                ctx.lineWidth = CONFIG.linkWidth;
-
+            function drawLines() {
                 for (let i = 0; i < particles.length; i++) {
-                    const a = particles[i];
-
                     for (let j = i + 1; j < particles.length; j++) {
-                        const bP = particles[j];
-                        const dx = a.x - bP.x;
-                        const dy = a.y - bP.y;
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distSq = dx * dx + dy * dy;
+                        const maxDistSq = CONFIG.linkDistance * CONFIG.linkDistance;
 
-                        // Quick bounding check
-                        if (Math.abs(dx) > CONFIG.linkDistance || Math.abs(dy) > CONFIG.linkDistance) continue;
-
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-
-                        if (dist < CONFIG.linkDistance) {
-                            const opacity = (1 - dist / CONFIG.linkDistance) * CONFIG.linkOpacity;
+                        if (distSq < maxDistSq) {
+                            const opacity = (1 - Math.sqrt(distSq) / CONFIG.linkDistance) * CONFIG.linkOpacity;
                             ctx.beginPath();
-                            ctx.moveTo(a.x, a.y);
-                            ctx.lineTo(bP.x, bP.y);
-                            ctx.strokeStyle = `rgba(${lr}, ${lg}, ${lb}, ${opacity})`;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(${CONFIG.linkColor.r}, ${CONFIG.linkColor.g}, ${CONFIG.linkColor.b}, ${opacity})`;
+                            ctx.lineWidth = CONFIG.linkWidth;
                             ctx.stroke();
                         }
                     }
-                }
-
-                // Draw particles on top
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.opacity})`;
-                    ctx.fill();
                 }
             }
 
             function animate() {
                 ctx.clearRect(0, 0, width, height);
-                updateParticles();
-                drawParticles();
+                
+                particles.forEach(p => p.update());
+                drawLines();
+                particles.forEach(p => p.draw());
+
                 requestAnimationFrame(animate);
             }
 
-            // Event listeners
             window.addEventListener('mousemove', e => {
                 mouse.x = e.clientX;
                 mouse.y = e.clientY;
@@ -473,7 +464,6 @@
             animate();
         })();
     </script>
-
 </body>
 
 </html>
