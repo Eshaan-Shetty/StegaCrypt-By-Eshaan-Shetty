@@ -390,7 +390,7 @@
                 if (users[email] && users[email] === password) {
                     // Success
                     localStorage.setItem('stegacrypt_logged_in', 'true');
-                    window.location.href = 'splash.html';
+                    window.location.href = 'index.html';
                 } else {
                     errorMsg.textContent = 'Invalid email or password.';
                     errorMsg.style.display = 'block';
@@ -417,7 +417,7 @@
 
         // Check if already logged in
         if (localStorage.getItem('stegacrypt_logged_in') === 'true') {
-            window.location.href = 'splash.html';
+            window.location.href = 'index.html';
         }
     </script>
 </body>
